@@ -1,8 +1,15 @@
+import { MantineProvider } from "@mantine/core"
+import AppShellLayout from "./core/components/AppShell"
+
+import '../src/assets/icons/style.css'
+
 function App() {
 
   return (
     <div className="App">
-      Helo
+      <MantineProvider>
+        <AppShellLayout />
+      </MantineProvider>
     </div>
   )
 }
