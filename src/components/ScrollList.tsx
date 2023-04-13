@@ -1,7 +1,7 @@
-import { useLayoutEffect, useMemo, useRef } from "react";
-import ListTable from "./ListTable";
-import ListGrid from "./ListGrid";
+import { useLayoutEffect, useMemo, useRef, useState, useEffect } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 import { Badge, Button, Card, Group, Image, Paper, Table, Text, createStyles } from "@mantine/core";
+
 
 const useStyle = createStyles((theme) => ({
     head: {
@@ -26,7 +26,7 @@ const useStyle = createStyles((theme) => ({
 }))
 
 
-function ScrollList({ userData, currentView, isGridView }: any) {
+function ScrollList({ userData, currentView, isGridView, fetchNewData, hasMore }: any) {
 
     const { classes, cx } = useStyle();
 
@@ -60,7 +60,14 @@ function ScrollList({ userData, currentView, isGridView }: any) {
     }, [scrollTo, currentView]);
 
     return (
-        <>
+        <InfiniteScroll
+            dataLength={30}
+            next={() => { console.log("hello") }}
+            hasMore={hasMore}
+            loader={<h4>Loading...</h4>}
+            scrollThreshold={0.7}
+        // endMessage={<h6>Katam</h6>}
+        >
             <Table striped highlightOnHover horizontalSpacing="md" verticalSpacing="md" fontSize="md">
                 <thead
                     className={cx(classes.head,
@@ -74,6 +81,7 @@ function ScrollList({ userData, currentView, isGridView }: any) {
                         <th>IsCompleted</th>
                     </tr>
                 </thead>
+
 
                 <tbody ref={containerRef} className={isGridView ? classes.list_grid : ""} >
                     {
@@ -90,8 +98,7 @@ function ScrollList({ userData, currentView, isGridView }: any) {
                                 }
 
                                 {isGridView &&
-                                    <td colSpan={5}>
-
+                                    <td>
                                         <Card shadow="sm" padding="lg" radius="md" withBorder >
                                             <Image
                                                 src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
@@ -121,9 +128,7 @@ function ScrollList({ userData, currentView, isGridView }: any) {
                     }
                 </tbody>
             </Table>
-            {/* <div ref={containerRef}>
-        </div> */}
-        </>
+        </InfiniteScroll>
     )
 }
 
