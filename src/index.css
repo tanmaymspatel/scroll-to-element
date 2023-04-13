@@ -15,7 +15,7 @@ body,
 
 html,
 body {
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .h-100 {
@@ -32,4 +32,8 @@ body {
 
 .flex-grow-1 {
   flex-grow: 1;
+}
+
+.mantine-AppShell-root {
+  display: flex;
 }

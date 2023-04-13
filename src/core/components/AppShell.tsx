@@ -28,6 +28,7 @@ function AppShellLayout() {
     const { classes } = useStyle();
     return (
         <AppShell
+            h={"100%"}
             styles={{
                 main: {
                     background: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0],
@@ -35,7 +36,7 @@ function AppShellLayout() {
             }}
             navbarOffsetBreakpoint="sm"
             navbar={
-                <Navbar
+                < Navbar
                     hiddenBreakpoint="sm"
                     hidden={!opened}
                     width={{ base: "100%", sm: 80 }}
@@ -51,15 +52,15 @@ function AppShellLayout() {
                         />
                     </MediaQuery>
                     <MainNavbar />
-                </Navbar>
+                </Navbar >
             }
             header={
-                <MainHeader opened={opened} setOpened={setOpened} />
+                < MainHeader opened={opened} setOpened={setOpened} />
             }
             layout='alt'
         >
             <MainView />
-        </AppShell>
+        </AppShell >
     );
 }
 
