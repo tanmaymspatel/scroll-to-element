@@ -5,7 +5,6 @@ import AppShellLayout from "./core/components/AppShell"
 import '../src/assets/icons/style.css'
 
 function App() {
-
   return (
     <div className="App">
       <MantineProvider>
@@ -17,4 +16,6 @@ function App() {
   )
 }
 
-export default App
+export default App;
+
+

@@ -1,8 +1,10 @@
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 import { useNavigate } from 'react-router-dom';
-import ListTable from "./ListTable";
-import ListGrid from "./ListGrid";
-import { Badge, Button, Card, Group, Image, Paper, Table, Text, createStyles } from "@mantine/core";
+import { useInfiniteQuery } from 'react-query'
+
+import { Table, createStyles } from "@mantine/core";
+import SingleUser from "./SingleUser";
+import scrollServices from "../shared/services/scrollServices";
 
 const useStyle = createStyles((theme) => ({
     head: {
@@ -30,7 +32,38 @@ const useStyle = createStyles((theme) => ({
 function ScrollList({ userData, currentView, isGridView }: any) {
 
     const { classes, cx } = useStyle();
-    const navigate = useNavigate();
+    const { getUsers } = scrollServices;
+
+    const {
+        fetchNextPage, //function 
+        hasNextPage, // boolean
+        isFetchingNextPage, // boolean
+        data,
+        status,
+        error
+    } = useInfiniteQuery('/users', ({ pageParam = 1 }) => getUsers(pageParam), {
+        getNextPageParam: (lastPage, allPages) => {
+            return lastPage.length ? allPages.length + 1 : undefined
+        }
+    })
+
+    const intObserver = useRef<any>()
+    const lastPostRef = useCallback((user: any) => {
+        if (isFetchingNextPage) return
+
+        if (intObserver.current) intObserver.current.disconnect()
+
+        intObserver.current = new IntersectionObserver(users => {
+            if (users[0].isIntersecting && hasNextPage) {
+                console.log('We are near the last post!')
+                fetchNextPage()
+            }
+        })
+
+        if (user) intObserver.current.observe(user)
+    }, [isFetchingNextPage, fetchNextPage, hasNextPage])
+
+    // if (status === 'error') return <p className='center'>Error: {error.message}</p>
 
     // Helper function that allows finding first element in the view port
     const findFirstElementInViewPort = (elements: any) =>
@@ -61,6 +94,15 @@ function ScrollList({ userData, currentView, isGridView }: any) {
         }
     }, [scrollTo, currentView]);
 
+    const content = data?.pages?.map((pg) => {
+        return pg.map((user: any, index: number) => {
+            if (pg.length === index + 1) {
+                return <SingleUser ref={lastPostRef} key={user.id} user={user} index={index} isGridView={isGridView} />
+            }
+            return <SingleUser key={user.id} user={user} index={index} isGridView={isGridView} />
+        })
+    })
+
     return (
         <>
             <Table striped highlightOnHover horizontalSpacing="md" verticalSpacing="md" fontSize="md">
@@ -69,58 +111,15 @@ function ScrollList({ userData, currentView, isGridView }: any) {
                         { [classes.header_visibility]: isGridView }
                     )}>
                     <tr>
-                        <th>#</th>
-                        <th>Title</th>
                         <th>id</th>
+                        <th>Title</th>
                         <th>User id</th>
                         <th>IsCompleted</th>
                     </tr>
                 </thead>
 
                 <tbody ref={containerRef} className={isGridView ? classes.list_grid : ""} >
-                    {
-                        userData?.map((user: any, index: number) => (
-                            <tr data-item="true" key={user.id} onClick={() => navigate(`dashboard/${user.id}`)}>
-                                {!isGridView &&
-                                    <>
-                                        <td>{index + 1}</td>
-                                        <td>{user.title}</td>
-                                        <td>{user.id}</td>
-                                        <td>{user.userId}</td>
-                                        <td>{user.completed ? "YES" : "NO"}</td>
-                                    </>
-                                }
-
-                                {isGridView &&
-                                    <td colSpan={5}>
-
-                                        <Card shadow="sm" padding="lg" radius="md" withBorder >
-                                            <Image
-                                                src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
-                                                height={160}
-                                                alt="Norway"
-                                            />
-
-                                            <Group position="apart" mt="md" mb="xs">
-                                                <Text weight={500}>id:{user.id}</Text>
-                                                <Badge color="pink" variant="light">
-                                                    User id: {user.userId}
-                                                </Badge>
-                                            </Group>
-
-                                            <Text size="sm" color="dimmed">
-                                                {user.title}
-                                            </Text>
-
-                                            <Button variant="light" color="blue" fullWidth mt="md" radius="md">
-                                                IsCompleted: {user.completed ? "YES" : "NO"}
-                                            </Button>
-                                        </Card>
-                                    </td>
-                                }
-                            </tr>
-                        ))
-                    }
+                    {content}
                 </tbody>
             </Table>
             {/* <div ref={containerRef}>
