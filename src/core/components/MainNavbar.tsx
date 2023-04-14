@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Navbar, Center, Tooltip, createStyles, Stack, rem, Image, Text, MediaQuery } from '@mantine/core';
+import { NavLink } from 'react-router-dom'
+
 import logo1R from '../../assets/images/1R-logo.svg'
 
 const useStyles = createStyles((theme) => ({
     link: {
-        width: rem(50),
+        width: "100%",
         height: rem(50),
         borderRadius: theme.radius.sm,
         fontSize: "20px",
@@ -16,6 +18,7 @@ const useStyles = createStyles((theme) => ({
         borderLeft: `2px solid transparent`,
         cursor: "pointer",
         transition: "0.2s all",
+        textDecoration: "none",
         '&:hover': {
             borderLeft: `2px solid ${theme.white}`,
             opacity: 1,
@@ -55,12 +58,12 @@ function NavbarLink({ icon, label, active, onClick }: NavbarLinkProps) {
     const { classes, cx } = useStyles();
     return (
         <Tooltip label={label} position="right" transitionProps={{ duration: 0 }}>
-            <Text onClick={onClick} w={"100%"} className={cx(classes.link, { [classes.active]: active })}>
+            <NavLink to={`/${label.toLowerCase()}`} onClick={onClick} className={cx(classes.link, { [classes.active]: active })}>
                 <Text component="span" className={icon}></Text>
                 <MediaQuery largerThan="sm" styles={{ display: "none" }}>
                     <Text ml="lg">{label}</Text>
                 </MediaQuery>
-            </Text>
+            </NavLink>
         </Tooltip>
     );
 }
@@ -75,7 +78,7 @@ const mockdata = [
 ];
 
 function MainNavbar() {
-    const [active, setActive] = useState(5);
+    const [active, setActive] = useState(0);
     const { classes } = useStyles();
 
     const links = mockdata.map((link: any, index) => (

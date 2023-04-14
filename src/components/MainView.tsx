@@ -1,4 +1,4 @@
-import { Stack, Switch, createStyles } from '@mantine/core'
+import { Stack, createStyles } from '@mantine/core'
 import scrollServices from '../shared/services/scrollServices'
 import { useEffect, useState } from 'react';
 import ScrollList from './ScrollList';

@@ -1,4 +1,5 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
+import { useNavigate } from 'react-router-dom';
 import ListTable from "./ListTable";
 import ListGrid from "./ListGrid";
 import { Badge, Button, Card, Group, Image, Paper, Table, Text, createStyles } from "@mantine/core";
@@ -29,6 +30,7 @@ const useStyle = createStyles((theme) => ({
 function ScrollList({ userData, currentView, isGridView }: any) {
 
     const { classes, cx } = useStyle();
+    const navigate = useNavigate();
 
     // Helper function that allows finding first element in the view port
     const findFirstElementInViewPort = (elements: any) =>
@@ -78,7 +80,7 @@ function ScrollList({ userData, currentView, isGridView }: any) {
                 <tbody ref={containerRef} className={isGridView ? classes.list_grid : ""} >
                     {
                         userData?.map((user: any, index: number) => (
-                            <tr data-item="true" key={user.id}>
+                            <tr data-item="true" key={user.id} onClick={() => navigate(`dashboard/${user.id}`)}>
                                 {!isGridView &&
                                     <>
                                         <td>{index + 1}</td>

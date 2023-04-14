@@ -1,3 +1,4 @@
+import { BrowserRouter } from 'react-router-dom';
 import { MantineProvider } from "@mantine/core"
 import AppShellLayout from "./core/components/AppShell"
 
@@ -8,7 +9,9 @@ function App() {
   return (
     <div className="App">
       <MantineProvider>
-        <AppShellLayout />
+        <BrowserRouter>
+          <AppShellLayout />
+        </BrowserRouter>
       </MantineProvider>
     </div>
   )
