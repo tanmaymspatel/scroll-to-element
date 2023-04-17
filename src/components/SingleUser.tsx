@@ -1,6 +1,6 @@
 import { Badge, Button, Card, Group, Image, MediaQuery, Text, createStyles } from '@mantine/core';
-import { useNavigate } from 'react-router-dom';
-import react from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import react, { useEffect, useState } from 'react';
 
 const useStyle = createStyles(() => ({
     text_ellipsis: {
@@ -12,19 +12,25 @@ const useStyle = createStyles(() => ({
 
 }))
 
-const SingleUser = react.forwardRef(({ user, isGridView, index }: any, ref: any) => {
+const SingleUser = react.forwardRef(({ user, isGridView }: any, ref: any) => {
 
     const { classes } = useStyle();
-    console.log({ isGridView });
-
-
     const navigate = useNavigate();
+
+
+    const navigateToDetails = (id: number, e: any) => {
+        navigate(`${id}`);
+        console.log(e.target);
+        localStorage.setItem("ypos", (e.target.getBoundingClientRect().y));
+    }
+
+
     const body = (
         <>
             {!isGridView &&
                 <>
-                    <td>{user.id}</td>
-                    <td>{user.title}</td>
+                    <td >{user.id}</td>
+                    <td style={{ cursor: "pointer" }} >{user.title}</td>
                     <td>{user.userId}</td>
                     <td>{user.completed ? "YES" : "NO"}</td>
                 </>
@@ -47,7 +53,10 @@ const SingleUser = react.forwardRef(({ user, isGridView, index }: any, ref: any)
                                 </Badge>
                             </Group>
 
-                            <Text size="sm" color="dimmed" className={classes.text_ellipsis}>
+                            <Text size="sm" color="dimmed" className={classes.text_ellipsis}
+
+                                style={{ cursor: "pointer" }}
+                            >
                                 {user.title}
                             </Text>
 
@@ -62,8 +71,8 @@ const SingleUser = react.forwardRef(({ user, isGridView, index }: any, ref: any)
     )
 
     const content = ref
-        ? <tr ref={ref} data-item="true" onClick={() => navigate(`dashboard/${user.id}`)} style={isGridView ? { display: "flex" } : {}}>{body}</tr>
-        : <tr data-item="true" onClick={() => navigate(`dashboard/${user.id}`)} style={isGridView ? { display: "flex" } : {}}>{body}</tr>
+        ? <tr ref={ref} data-item="true" style={isGridView ? { display: "flex" } : {}} onClick={(e) => navigateToDetails(user?.id, e)}>{body}</tr>
+        : <tr data-item="true" style={isGridView ? { display: "flex" } : {}} onClick={(e) => navigateToDetails(user?.id, e)}>{body}</tr>
 
     return content
 })

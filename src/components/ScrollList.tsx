@@ -84,6 +84,7 @@ function ScrollList({ userData, currentView, isGridView }: any) {
     const scrollTo = useMemo(() => {
         // Find all elements in container which will be checked if are in view or not
         const nodeElements = containerRef.current?.querySelectorAll("[data-item]");
+
         if (nodeElements) {
             return findFirstElementInViewPort(nodeElements);
         }
@@ -103,9 +104,9 @@ function ScrollList({ userData, currentView, isGridView }: any) {
     const content = data?.pages?.map((pg) => {
         return pg.map((user: any, index: number) => {
             if (pg.length === index + 1) {
-                return <SingleUser ref={lastPostRef} key={user.id} user={user} index={index} isGridView={isGridView} />
+                return <SingleUser ref={lastPostRef} key={user.id} user={user} isGridView={isGridView} />
             }
-            return <SingleUser key={user.id} user={user} index={index} isGridView={isGridView} />
+            return <SingleUser key={user.id} user={user} isGridView={isGridView} />
         })
     })
 

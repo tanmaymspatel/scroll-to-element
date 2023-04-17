@@ -13,6 +13,7 @@ import {
 import MainNavbar from './MainNavbar';
 import MainHeader from './MainHeader';
 import MainView from '../../components/MainView';
+import Routing from './Routing';
 
 const useStyle = createStyles(() => ({
     'nav-hamburger': {
@@ -60,7 +61,7 @@ function AppShellLayout() {
             }
             layout='alt'
         >
-            <MainView />
+            <Routing />
         </AppShell >
     );
 }
