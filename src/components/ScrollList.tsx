@@ -19,8 +19,15 @@ const useStyle = createStyles((theme) => ({
     },
     list_grid: {
         display: "grid",
-        gridTemplateColumns: "repeat(4, 1fr)",
+        gridTemplateColumns: "repeat(3, 1fr)",
         gridGap: "5px",
+
+        [theme.fn.smallerThan('xl')]: {
+            gridTemplateColumns: "repeat(2, 1fr)",
+        },
+        [theme.fn.smallerThan('md')]: {
+            gridTemplateColumns: "repeat(1, 1fr)",
+        }
     },
     header_visibility: {
         visibility: "hidden",
@@ -55,7 +62,6 @@ function ScrollList({ userData, currentView, isGridView }: any) {
 
         intObserver.current = new IntersectionObserver(users => {
             if (users[0].isIntersecting && hasNextPage) {
-                console.log('We are near the last post!')
                 fetchNextPage()
             }
         })
