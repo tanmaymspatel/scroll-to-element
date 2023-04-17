@@ -5,10 +5,17 @@ import AppShellLayout from "./core/components/AppShell"
 import '../src/assets/icons/style.css'
 
 function App() {
-
   return (
     <div className="App">
-      <MantineProvider>
+      <MantineProvider theme={{
+        breakpoints: {
+          xs: '30em',
+          sm: '36em',
+          md: '48em',
+          lg: '62em',
+          xl: '75em',
+        }
+      }}>
         <BrowserRouter>
           <AppShellLayout />
         </BrowserRouter>
@@ -17,4 +24,6 @@ function App() {
   )
 }
 
-export default App
+export default App;
+
+
