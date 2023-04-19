@@ -25,7 +25,6 @@ function MainView() {
 
     useEffect(() => {
         if (window.innerWidth < 576) setCurrentView("grid");
-        if (window.innerWidth > 576) setCurrentView("list");
     })
 
     return (

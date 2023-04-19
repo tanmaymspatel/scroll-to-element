@@ -29,7 +29,7 @@ const SingleUser = react.forwardRef(({ user, isGridView, }: ISingleUSerProps, re
      * @description navigates to respective details of the user page; stores values of id and isclicked to the localstorage 
      */
     const navigateToDetails = (id: number) => {
-        navigate(`dashboard/${id}`);
+        navigate(`${id}`);
         localStorage.setItem("id", JSON.stringify(id));
         localStorage.setItem("isClicked", "yes");
     }
