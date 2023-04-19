@@ -12,7 +12,6 @@ import {
 } from '@mantine/core';
 import MainNavbar from './MainNavbar';
 import MainHeader from './MainHeader';
-import MainView from '../../components/MainView';
 import Routing from './Routing';
 
 const useStyle = createStyles(() => ({
@@ -33,7 +32,7 @@ function AppShellLayout() {
             styles={{
                 main: {
                     background: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0],
-                    height: "100%"
+                    // flex: "0 0 100%"
                 },
             }}
             navbarOffsetBreakpoint="sm"

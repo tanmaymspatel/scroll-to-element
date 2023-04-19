@@ -1,8 +1,8 @@
-import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useInfiniteQuery } from 'react-query'
 
-import { Table, createStyles } from "@mantine/core";
+import { MediaQuery, Table, createStyles } from "@mantine/core";
 import SingleUser from "./SingleUser";
 import scrollServices from "../shared/services/scrollServices";
 
@@ -40,6 +40,8 @@ function ScrollList({ userData, currentView, isGridView }: any) {
 
     const { classes, cx } = useStyle();
     const { getUsers } = scrollServices;
+    const [a, setA] = useState<any>()
+
 
     const {
         fetchNextPage, //function 
@@ -75,7 +77,7 @@ function ScrollList({ userData, currentView, isGridView }: any) {
     const findFirstElementInViewPort = (elements: any) =>
         Array.prototype.find.call(
             elements,
-            element => element.getBoundingClientRect().y >= 85 // nav height offset
+            element => element.getBoundingClientRect().y >= 150 // header offset
         );
 
     // Ref to the container with elements
@@ -96,8 +98,8 @@ function ScrollList({ userData, currentView, isGridView }: any) {
         if (scrollTo) {
             // Scroll to element with should be in view after rendering
             scrollTo.scrollIntoView();
-            // Scroll by height of nav
-            window.scrollBy(0, -85);
+            // Scroll by height of header
+            window.scrollBy(0, -150);
         }
     }, [scrollTo, currentView]);
 
@@ -110,20 +112,33 @@ function ScrollList({ userData, currentView, isGridView }: any) {
         })
     })
 
+    const getEl = () => {
+        let id = (parseInt(localStorage.getItem("id") as string));
+        id--;
+        const isClicked = localStorage.getItem("isClicked") as string
+        if (isClicked === "yes") document.getElementById(`td-${id}`)?.scrollIntoView();
+    }
+
+    useLayoutEffect(() => {
+        getEl()
+    }, [getEl])
+
     return (
         <>
             <Table striped highlightOnHover horizontalSpacing="md" verticalSpacing="md" fontSize="md">
-                <thead
-                    className={cx(classes.head,
-                        { [classes.header_visibility]: isGridView }
-                    )}>
-                    <tr>
-                        <th>id</th>
-                        <th>Title</th>
-                        <th>User id</th>
-                        <th>IsCompleted</th>
-                    </tr>
-                </thead>
+                <MediaQuery smallerThan={"sm"} styles={{ display: "none" }}>
+                    <thead
+                        className={cx(classes.head,
+                            { [classes.header_visibility]: isGridView }
+                        )}>
+                        <tr>
+                            <th>id</th>
+                            <th>Title</th>
+                            <th>User id</th>
+                            <th>IsCompleted</th>
+                        </tr>
+                    </thead>
+                </MediaQuery>
 
                 <tbody ref={containerRef} className={isGridView ? classes.list_grid : ""} >
                     {content}

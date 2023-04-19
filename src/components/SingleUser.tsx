@@ -1,6 +1,6 @@
 import { Badge, Button, Card, Group, Image, MediaQuery, Text, createStyles } from '@mantine/core';
-import { NavLink, useNavigate } from 'react-router-dom';
-import react, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import react, { useRef } from 'react';
 
 const useStyle = createStyles(() => ({
     text_ellipsis: {
@@ -9,36 +9,36 @@ const useStyle = createStyles(() => ({
         whiteSpace: "nowrap",
         width: "300px"
     },
-
 }))
 
-const SingleUser = react.forwardRef(({ user, isGridView }: any, ref: any) => {
+const SingleUser = react.forwardRef(({ user, isGridView, }: any, ref: any) => {
 
     const { classes } = useStyle();
     const navigate = useNavigate();
 
-
     const navigateToDetails = (id: number, e: any) => {
-        navigate(`${id}`);
-        console.log(e.target);
-        localStorage.setItem("ypos", (e.target.getBoundingClientRect().y));
+        navigate(`dashboard/${id}`);
+        console.log(document.getElementById(`td-${id}`));
+        localStorage.setItem("id", JSON.stringify(id));
+        localStorage.setItem("isClicked", "yes");
     }
-
 
     const body = (
         <>
             {!isGridView &&
-                <>
-                    <td >{user.id}</td>
-                    <td style={{ cursor: "pointer" }} >{user.title}</td>
-                    <td>{user.userId}</td>
-                    <td>{user.completed ? "YES" : "NO"}</td>
-                </>
+                <MediaQuery smallerThan={"sm"} styles={{ display: "none" }}>
+                    <>
+                        <td >{user.id}</td>
+                        <td id={`td-${user.id}`} style={{ cursor: "pointer" }} >{user.title}</td>
+                        <td>{user.userId}</td>
+                        <td>{user.completed ? "YES" : "NO"}</td>
+                    </>
+                </MediaQuery>
             }
 
             {isGridView &&
                 <MediaQuery smallerThan={"sm"} styles={{ display: "block" }}>
-                    <td colSpan={5} style={isGridView ? { flexGrow: 1, flexShrink: 1 } : {}}>
+                    <td colSpan={5} style={isGridView ? { flexGrow: 1, flexShrink: 1, borderTop: 0 } : {}}>
                         <Card shadow="sm" padding="lg" radius="md" withBorder >
                             <Image
                                 src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
@@ -74,7 +74,7 @@ const SingleUser = react.forwardRef(({ user, isGridView }: any, ref: any) => {
         ? <tr ref={ref} data-item="true" style={isGridView ? { display: "flex" } : {}} onClick={(e) => navigateToDetails(user?.id, e)}>{body}</tr>
         : <tr data-item="true" style={isGridView ? { display: "flex" } : {}} onClick={(e) => navigateToDetails(user?.id, e)}>{body}</tr>
 
-    return content
+    return content;
 })
 
-export default SingleUser
+export default SingleUser;

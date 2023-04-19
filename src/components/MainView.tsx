@@ -1,4 +1,4 @@
-import { Stack, createStyles } from '@mantine/core'
+import { MediaQuery, Stack, createStyles } from '@mantine/core'
 import scrollServices from '../shared/services/scrollServices'
 import { useEffect, useState } from 'react';
 import ScrollList from './ScrollList';
@@ -25,13 +25,20 @@ function MainView() {
     const isGridView = currentView === "grid";
 
     useEffect(() => {
+        if (window.innerWidth < 576) setCurrentView("grid");
+        if (window.innerWidth > 576) setCurrentView("list");
+    })
+
+    useEffect(() => {
         getAllUsers().then(res => setUserData(res.data))
     }, [])
     return (
         <Stack h={"100%"} spacing={0}>
-            <header className={classes.header}>
-                <Header setCurrentView={setCurrentView} isGridView={isGridView} />
-            </header>
+            <MediaQuery smallerThan={"sm"} styles={{ display: "none" }}>
+                <header className={classes.header}>
+                    <Header setCurrentView={setCurrentView} isGridView={isGridView} />
+                </header>
+            </MediaQuery>
             <main className={classes.main}>
                 <ScrollList userData={userData} currentView={currentView} isGridView={isGridView} />
             </main>
