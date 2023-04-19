@@ -7,7 +7,14 @@ import iconNotifications from '../../assets/images/icon-notification.svg';
 import iconHelp from '../../assets/images/icon-help.svg';
 import imageUser from '../../assets/images/image-employee.svg';
 
-function MainHeader({ opened, setOpened }: any) {
+interface IMainHeader {
+    opened: boolean,
+    setOpened: React.Dispatch<React.SetStateAction<boolean>>
+}
+/**
+ * @returns header of the application
+ */
+function MainHeader({ opened, setOpened }: IMainHeader) {
 
     const theme = useMantineTheme();
     return (
@@ -57,6 +64,6 @@ function MainHeader({ opened, setOpened }: any) {
             </Header>
         </MediaQuery>
     )
-}
+};
 
-export default MainHeader
+export default MainHeader;

@@ -1,7 +1,10 @@
 import { Routes, Route } from "react-router-dom"
+
 import MainView from "../../components/MainView"
 import UserDetails from "../../components/UserDetails";
-
+/**
+ * @returns routing of the application 
+ */
 function Routing() {
     return (
         <Routes>

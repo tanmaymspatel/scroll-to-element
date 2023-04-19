@@ -1,5 +1,4 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery } from 'react-query'
 
 import { MediaQuery, Table, createStyles } from "@mantine/core";
@@ -35,21 +34,24 @@ const useStyle = createStyles((theme) => ({
     }
 }))
 
+interface IScrollListProps {
+    currentView: string,
+    isGridView: boolean
+}
 
-function ScrollList({ userData, currentView, isGridView }: any) {
+/**
+ * @returns 
+ */
+function ScrollList({ currentView, isGridView }: IScrollListProps) {
 
     const { classes, cx } = useStyle();
     const { getUsers } = scrollServices;
-    const [a, setA] = useState<any>()
-
 
     const {
         fetchNextPage, //function 
         hasNextPage, // boolean
         isFetchingNextPage, // boolean
         data,
-        status,
-        error
     } = useInfiniteQuery('/users', ({ pageParam = 1 }) => getUsers(pageParam), {
         getNextPageParam: (lastPage, allPages) => {
             return lastPage.length ? allPages.length + 1 : undefined
@@ -70,8 +72,6 @@ function ScrollList({ userData, currentView, isGridView }: any) {
 
         if (user) intObserver.current.observe(user)
     }, [isFetchingNextPage, fetchNextPage, hasNextPage])
-
-    // if (status === 'error') return <p className='center'>Error: {error.message}</p>
 
     // Helper function that allows finding first element in the view port
     const findFirstElementInViewPort = (elements: any) =>
@@ -111,17 +111,20 @@ function ScrollList({ userData, currentView, isGridView }: any) {
             return <SingleUser key={user.id} user={user} isGridView={isGridView} />
         })
     })
-
-    const getEl = () => {
+    /**
+     * @name getElAfterBack
+     * @description method to restore the scroll after hiiting the back button
+     */
+    const getElAfterBack = () => {
         let id = (parseInt(localStorage.getItem("id") as string));
         id--;
         const isClicked = localStorage.getItem("isClicked") as string
-        if (isClicked === "yes") document.getElementById(`td-${id}`)?.scrollIntoView();
+        if (isClicked === "yes") document.getElementById(`list-td-${id}`)?.scrollIntoView();
     }
-
+    // calls before browser reprints the screen
     useLayoutEffect(() => {
-        getEl()
-    }, [getEl])
+        getElAfterBack()
+    }, [getElAfterBack])
 
     return (
         <>
@@ -139,13 +142,10 @@ function ScrollList({ userData, currentView, isGridView }: any) {
                         </tr>
                     </thead>
                 </MediaQuery>
-
                 <tbody ref={containerRef} className={isGridView ? classes.list_grid : ""} >
                     {content}
                 </tbody>
             </Table>
-            {/* <div ref={containerRef}>
-        </div> */}
         </>
     )
 }

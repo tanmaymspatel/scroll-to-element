@@ -1,6 +1,7 @@
 import { Badge, Button, Card, Group, Image, MediaQuery, Text, createStyles } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
-import react, { useRef } from 'react';
+import react from 'react';
+import { userDetails } from '../shared/model/userDetails';
 
 const useStyle = createStyles(() => ({
     text_ellipsis: {
@@ -11,14 +12,24 @@ const useStyle = createStyles(() => ({
     },
 }))
 
-const SingleUser = react.forwardRef(({ user, isGridView, }: any, ref: any) => {
+interface ISingleUSerProps {
+    user: userDetails,
+    isGridView: boolean
+}
+/**
+ * @returns single user row
+ */
+const SingleUser = react.forwardRef(({ user, isGridView, }: ISingleUSerProps, ref: any) => {
 
     const { classes } = useStyle();
     const navigate = useNavigate();
-
-    const navigateToDetails = (id: number, e: any) => {
+    /**
+     * @name navigateToDetails
+     * @param id id of the clicked user 
+     * @description navigates to respective details of the user page; stores values of id and isclicked to the localstorage 
+     */
+    const navigateToDetails = (id: number) => {
         navigate(`dashboard/${id}`);
-        console.log(document.getElementById(`td-${id}`));
         localStorage.setItem("id", JSON.stringify(id));
         localStorage.setItem("isClicked", "yes");
     }
@@ -29,7 +40,7 @@ const SingleUser = react.forwardRef(({ user, isGridView, }: any, ref: any) => {
                 <MediaQuery smallerThan={"sm"} styles={{ display: "none" }}>
                     <>
                         <td >{user.id}</td>
-                        <td id={`td-${user.id}`} style={{ cursor: "pointer" }} >{user.title}</td>
+                        <td id={`list-td-${user.id}`} style={{ cursor: "pointer" }} >{user.title}</td>
                         <td>{user.userId}</td>
                         <td>{user.completed ? "YES" : "NO"}</td>
                     </>
@@ -71,8 +82,8 @@ const SingleUser = react.forwardRef(({ user, isGridView, }: any, ref: any) => {
     )
 
     const content = ref
-        ? <tr ref={ref} data-item="true" style={isGridView ? { display: "flex" } : {}} onClick={(e) => navigateToDetails(user?.id, e)}>{body}</tr>
-        : <tr data-item="true" style={isGridView ? { display: "flex" } : {}} onClick={(e) => navigateToDetails(user?.id, e)}>{body}</tr>
+        ? <tr ref={ref} data-item="true" style={isGridView ? { display: "flex" } : {}} onClick={() => navigateToDetails(user?.id)}>{body}</tr>
+        : <tr data-item="true" style={isGridView ? { display: "flex" } : {}} onClick={() => navigateToDetails(user?.id)}>{body}</tr>
 
     return content;
 })

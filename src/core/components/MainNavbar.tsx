@@ -47,14 +47,21 @@ const useStyles = createStyles((theme) => ({
     }
 }));
 
-interface NavbarLinkProps {
+interface INavbarLinkProps {
     icon: string;
     label: string;
     active?: boolean;
     onClick?(): void;
 }
 
-function NavbarLink({ icon, label, active, onClick }: NavbarLinkProps) {
+interface IlinkData {
+    icon: string,
+    label: string
+}
+/**
+ * @returns single nav link  
+ */
+function NavbarLink({ icon, label, active, onClick }: INavbarLinkProps) {
     const { classes, cx } = useStyles();
     return (
         <Tooltip label={label} position="right" transitionProps={{ duration: 0 }}>
@@ -68,7 +75,7 @@ function NavbarLink({ icon, label, active, onClick }: NavbarLinkProps) {
     );
 }
 
-const mockdata = [
+const mockdata: IlinkData[] = [
     { icon: "icon-dashboard", label: 'Dashboard' },
     { icon: "icon-projects", label: 'Projects' },
     { icon: "icon-team", label: 'Teams' },
@@ -76,12 +83,14 @@ const mockdata = [
     { icon: "icon-reimbursement", label: 'Reimbursement' },
     { icon: "icon-finance", label: 'Finance' },
 ];
-
+/**
+ * @returns navbar of the application
+ */
 function MainNavbar() {
     const [active, setActive] = useState(0);
     const { classes } = useStyles();
 
-    const links = mockdata.map((link: any, index) => (
+    const links = mockdata.map((link: IlinkData, index) => (
         <NavbarLink
             {...link}
             key={link.label}
