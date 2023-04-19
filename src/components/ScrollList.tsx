@@ -1,8 +1,7 @@
-import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery } from 'react-query'
 
-import { Table, createStyles } from "@mantine/core";
+import { MediaQuery, Table, createStyles } from "@mantine/core";
 import SingleUser from "./SingleUser";
 import scrollServices from "../shared/services/scrollServices";
 
@@ -35,8 +34,15 @@ const useStyle = createStyles((theme) => ({
     }
 }))
 
+interface IScrollListProps {
+    currentView: string,
+    isGridView: boolean
+}
 
-function ScrollList({ userData, currentView, isGridView }: any) {
+/**
+ * @returns 
+ */
+function ScrollList({ currentView, isGridView }: IScrollListProps) {
 
     const { classes, cx } = useStyle();
     const { getUsers } = scrollServices;
@@ -46,8 +52,6 @@ function ScrollList({ userData, currentView, isGridView }: any) {
         hasNextPage, // boolean
         isFetchingNextPage, // boolean
         data,
-        status,
-        error
     } = useInfiniteQuery('/users', ({ pageParam = 1 }) => getUsers(pageParam), {
         getNextPageParam: (lastPage, allPages) => {
             return lastPage.length ? allPages.length + 1 : undefined
@@ -69,13 +73,11 @@ function ScrollList({ userData, currentView, isGridView }: any) {
         if (user) intObserver.current.observe(user)
     }, [isFetchingNextPage, fetchNextPage, hasNextPage])
 
-    // if (status === 'error') return <p className='center'>Error: {error.message}</p>
-
     // Helper function that allows finding first element in the view port
     const findFirstElementInViewPort = (elements: any) =>
         Array.prototype.find.call(
             elements,
-            element => element.getBoundingClientRect().y >= 85 // nav height offset
+            element => element.getBoundingClientRect().y >= 150 // header offset
         );
 
     // Ref to the container with elements
@@ -84,6 +86,7 @@ function ScrollList({ userData, currentView, isGridView }: any) {
     const scrollTo = useMemo(() => {
         // Find all elements in container which will be checked if are in view or not
         const nodeElements = containerRef.current?.querySelectorAll("[data-item]");
+
         if (nodeElements) {
             return findFirstElementInViewPort(nodeElements);
         }
@@ -95,41 +98,54 @@ function ScrollList({ userData, currentView, isGridView }: any) {
         if (scrollTo) {
             // Scroll to element with should be in view after rendering
             scrollTo.scrollIntoView();
-            // Scroll by height of nav
-            window.scrollBy(0, -85);
+            // Scroll by height of header
+            window.scrollBy(0, -150);
         }
     }, [scrollTo, currentView]);
 
     const content = data?.pages?.map((pg) => {
         return pg.map((user: any, index: number) => {
             if (pg.length === index + 1) {
-                return <SingleUser ref={lastPostRef} key={user.id} user={user} index={index} isGridView={isGridView} />
+                return <SingleUser ref={lastPostRef} key={user.id} user={user} isGridView={isGridView} />
             }
-            return <SingleUser key={user.id} user={user} index={index} isGridView={isGridView} />
+            return <SingleUser key={user.id} user={user} isGridView={isGridView} />
         })
     })
+    /**
+     * @name getElAfterBack
+     * @description method to restore the scroll after hiiting the back button
+     */
+    const getElAfterBack = () => {
+        let id = (parseInt(localStorage.getItem("id") as string));
+        id--;
+        const isClicked = localStorage.getItem("isClicked") as string
+        if (isClicked === "yes") document.getElementById(`list-td-${id}`)?.scrollIntoView();
+    }
+    // calls before browser reprints the screen
+    useLayoutEffect(() => {
+        getElAfterBack()
+    }, [getElAfterBack])
 
     return (
         <>
             <Table striped highlightOnHover horizontalSpacing="md" verticalSpacing="md" fontSize="md">
-                <thead
-                    className={cx(classes.head,
-                        { [classes.header_visibility]: isGridView }
-                    )}>
-                    <tr>
-                        <th>id</th>
-                        <th>Title</th>
-                        <th>User id</th>
-                        <th>IsCompleted</th>
-                    </tr>
-                </thead>
-
+                <MediaQuery smallerThan={"sm"} styles={{ display: "none" }}>
+                    <thead
+                        className={cx(classes.head,
+                            { [classes.header_visibility]: isGridView }
+                        )}>
+                        <tr>
+                            <th>id</th>
+                            <th>Title</th>
+                            <th>User id</th>
+                            <th>IsCompleted</th>
+                        </tr>
+                    </thead>
+                </MediaQuery>
                 <tbody ref={containerRef} className={isGridView ? classes.list_grid : ""} >
                     {content}
                 </tbody>
             </Table>
-            {/* <div ref={containerRef}>
-        </div> */}
         </>
     )
 }

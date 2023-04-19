@@ -15,7 +15,7 @@ const getUsers = async (pageParam = 1, options = {}) => {
 const getAllUsers = () => axios.get(`${baseUrl}/users`)
 /**
  * @param id user id of which data is to be fetched
- * @returns individual project details of perticular id
+ * @returns individual user details of perticular id
  */
 const getUserDetailsById = (id: string) => axios.get(`${baseUrl}/users/${id}`);
 /**

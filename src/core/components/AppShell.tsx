@@ -1,18 +1,15 @@
 import { useState } from 'react';
 import {
     AppShell,
-    Header,
-    Text,
     MediaQuery,
     Burger,
     useMantineTheme,
     Navbar,
     createStyles,
-    Stack,
 } from '@mantine/core';
 import MainNavbar from './MainNavbar';
 import MainHeader from './MainHeader';
-import MainView from '../../components/MainView';
+import Routing from './Routing';
 
 const useStyle = createStyles(() => ({
     'nav-hamburger': {
@@ -21,7 +18,9 @@ const useStyle = createStyles(() => ({
         left: "1rem"
     },
 }))
-
+/**
+ * @returns layout of the application 
+ */
 function AppShellLayout() {
     const theme = useMantineTheme();
     const [opened, setOpened] = useState(false);
@@ -32,7 +31,6 @@ function AppShellLayout() {
             styles={{
                 main: {
                     background: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0],
-                    height: "100%"
                 },
             }}
             navbarOffsetBreakpoint="sm"
@@ -60,7 +58,7 @@ function AppShellLayout() {
             }
             layout='alt'
         >
-            <MainView />
+            <Routing />
         </AppShell >
     );
 }
