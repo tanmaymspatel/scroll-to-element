@@ -1,5 +1,6 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { useInfiniteQuery } from 'react-query'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useInfiniteQuery } from 'react-query';
+import { useInView } from "react-intersection-observer";
 
 import { MediaQuery, Table, createStyles } from "@mantine/core";
 import SingleUser from "./SingleUser";
@@ -46,6 +47,7 @@ function ScrollList({ currentView, isGridView }: IScrollListProps) {
 
     const { classes, cx } = useStyle();
     const { getUsers } = scrollServices;
+    const { ref, inView } = useInView();
 
     const {
         fetchNextPage, //function 
@@ -58,20 +60,20 @@ function ScrollList({ currentView, isGridView }: IScrollListProps) {
         }
     })
 
-    const intObserver = useRef<any>()
-    const lastPostRef = useCallback((user: any) => {
-        if (isFetchingNextPage) return
+    // const intObserver = useRef<any>()
+    // const lastPostRef = useCallback((user: any) => {
+    //     if (isFetchingNextPage) return
 
-        if (intObserver.current) intObserver.current.disconnect()
+    //     if (intObserver.current) intObserver.current.disconnect()
 
-        intObserver.current = new IntersectionObserver(users => {
-            if (users[0].isIntersecting && hasNextPage) {
-                fetchNextPage()
-            }
-        })
+    //     intObserver.current = new IntersectionObserver(users => {
+    //         if (users[0].isIntersecting && hasNextPage) {
+    //             fetchNextPage()
+    //         }
+    //     })
 
-        if (user) intObserver.current.observe(user)
-    }, [isFetchingNextPage, fetchNextPage, hasNextPage])
+    //     if (user) intObserver.current.observe(user)
+    // }, [isFetchingNextPage, fetchNextPage, hasNextPage])
 
     // Helper function that allows finding first element in the view port
     const findFirstElementInViewPort = (elements: any) =>
@@ -106,7 +108,7 @@ function ScrollList({ currentView, isGridView }: IScrollListProps) {
     const content = data?.pages?.map((pg) => {
         return pg.map((user: any, index: number) => {
             if (pg.length === index + 1) {
-                return <SingleUser ref={lastPostRef} key={user.id} user={user} isGridView={isGridView} />
+                return <SingleUser ref={ref} key={user.id} user={user} isGridView={isGridView} />
             }
             return <SingleUser key={user.id} user={user} isGridView={isGridView} />
         })
@@ -125,6 +127,12 @@ function ScrollList({ currentView, isGridView }: IScrollListProps) {
     useLayoutEffect(() => {
         getElAfterBack()
     }, [getElAfterBack])
+
+    useEffect(() => {
+        if (inView && hasNextPage) {
+            fetchNextPage();
+        }
+    }, [inView, fetchNextPage, hasNextPage]);
 
     return (
         <>
