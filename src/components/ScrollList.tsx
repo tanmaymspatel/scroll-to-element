@@ -1,58 +1,26 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery } from 'react-query';
-import { useInView } from "react-intersection-observer";
 
-import { MediaQuery, Table, createStyles } from "@mantine/core";
-import SingleUser from "./SingleUser";
 import scrollServices from "../shared/services/scrollServices";
-
-const useStyle = createStyles((theme) => ({
-    head: {
-        position: "sticky",
-        top: 0,
-        backgroundColor: theme.white,
-    },
-    list: {
-        display: "grid",
-        gridTemplateColumns: "repeat(1, 1fr)",
-        gridGap: "5px",
-    },
-    list_grid: {
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gridGap: "5px",
-
-        [theme.fn.smallerThan('xl')]: {
-            gridTemplateColumns: "repeat(2, 1fr)",
-        },
-        [theme.fn.smallerThan('md')]: {
-            gridTemplateColumns: "repeat(1, 1fr)",
-        }
-    },
-    header_visibility: {
-        visibility: "hidden",
-        display: "none"
-    }
-}))
+import ListTable from "./ListTable";
+import ListCard from "./ListCard";
 
 interface IScrollListProps {
     currentView: string,
     isGridView: boolean
 }
-
 /**
  * @returns 
  */
 function ScrollList({ currentView, isGridView }: IScrollListProps) {
 
-    const { classes, cx } = useStyle();
     const { getUsers } = scrollServices;
-    const { ref, inView } = useInView();
+    const [idToBePreserved, setIdToBePreserved] = useState<number>(0);
+    const view = localStorage.getItem("currentView")
 
     const {
         fetchNextPage, //function 
         hasNextPage, // boolean
-        isFetchingNextPage, // boolean
         data,
     } = useInfiniteQuery('/users', ({ pageParam = 1 }) => getUsers(pageParam), {
         getNextPageParam: (lastPage, allPages) => {
@@ -60,26 +28,11 @@ function ScrollList({ currentView, isGridView }: IScrollListProps) {
         }
     })
 
-    // const intObserver = useRef<any>()
-    // const lastPostRef = useCallback((user: any) => {
-    //     if (isFetchingNextPage) return
-
-    //     if (intObserver.current) intObserver.current.disconnect()
-
-    //     intObserver.current = new IntersectionObserver(users => {
-    //         if (users[0].isIntersecting && hasNextPage) {
-    //             fetchNextPage()
-    //         }
-    //     })
-
-    //     if (user) intObserver.current.observe(user)
-    // }, [isFetchingNextPage, fetchNextPage, hasNextPage])
-
     // Helper function that allows finding first element in the view port
     const findFirstElementInViewPort = (elements: any) =>
         Array.prototype.find.call(
             elements,
-            element => element.getBoundingClientRect().y >= 150 // header offset
+            element => element.getBoundingClientRect().y >= 192 // header offset
         );
 
     // Ref to the container with elements
@@ -98,25 +51,29 @@ function ScrollList({ currentView, isGridView }: IScrollListProps) {
 
     useLayoutEffect(() => {
         if (scrollTo) {
-            // Scroll to element with should be in view after rendering
-            scrollTo.scrollIntoView();
-            // Scroll by height of header
-            window.scrollBy(0, -150);
-        }
-    }, [scrollTo, currentView]);
+            if (currentView === "grid") setIdToBePreserved(scrollTo.childNodes[0].firstChild.nodeValue)
 
-    const content = data?.pages?.map((pg) => {
-        return pg.map((user: any, index: number) => {
-            if (pg.length === index + 1) {
-                return <SingleUser ref={ref} key={user.id} user={user} isGridView={isGridView} />
-            }
-            return <SingleUser key={user.id} user={user} isGridView={isGridView} />
-        })
-    })
+            // Scroll to element with should be in view after rendering
+            // scrollTo.scrollIntoView();
+            // Scroll by height of header
+            if (currentView === "list") setIdToBePreserved(scrollTo.childNodes[0].childNodes[1]?.children[0]?.innerText.slice(3));
+
+        }
+    }, [currentView]);
+
+    // useEffect(() => {
+    //     console.log(scrollTo, idToBePreserved);
+    // }, [scrollTo, currentView, idToBePreserved])
+
+    // useEffect(() => {
+    //     if (currentView === "list") localStorage.setItem("idToBePreserved", (JSON.stringify(idToBePreserved)));
+    //     console.log({ currentView }, { idToBePreserved });
+    // }, [currentView, idToBePreserved])
+
     /**
      * @name getElAfterBack
      * @description method to restore the scroll after hiiting the back button
-     */
+    */
     const getElAfterBack = () => {
         let id = (parseInt(localStorage.getItem("id") as string));
         id--;
@@ -128,33 +85,44 @@ function ScrollList({ currentView, isGridView }: IScrollListProps) {
         getElAfterBack()
     }, [getElAfterBack])
 
-    useEffect(() => {
-        if (inView && hasNextPage) {
-            fetchNextPage();
+    // let ElementIdTobeScrolledAt: number;
+
+    // useEffect(() => {
+    //     ElementIdTobeScrolledAt = JSON.parse(localStorage.getItem("idToBePreserved") as string)
+    // }, [currentView])
+
+
+    const scrollToElement = () => {
+        if (idToBePreserved) {
+            if (view === "grid") {
+                document.getElementById(`card-${idToBePreserved}`)?.scrollIntoView()
+            }
+            if (view === "list") {
+                document.getElementById(`row-${idToBePreserved}`)?.scrollIntoView();
+            }
+            window.scrollBy(0, -192);
         }
-    }, [inView, fetchNextPage, hasNextPage]);
+    }
+
+    useEffect(() => {
+        scrollToElement()
+    }, [scrollToElement])
+
+    const dataProps = {
+        fetchNextPage,
+        hasNextPage,
+        data
+    }
 
     return (
-        <>
-            <Table striped highlightOnHover horizontalSpacing="md" verticalSpacing="md" fontSize="md">
-                <MediaQuery smallerThan={"sm"} styles={{ display: "none" }}>
-                    <thead
-                        className={cx(classes.head,
-                            { [classes.header_visibility]: isGridView }
-                        )}>
-                        <tr>
-                            <th>id</th>
-                            <th>Title</th>
-                            <th>User id</th>
-                            <th>IsCompleted</th>
-                        </tr>
-                    </thead>
-                </MediaQuery>
-                <tbody ref={containerRef} className={isGridView ? classes.list_grid : ""} >
-                    {content}
-                </tbody>
-            </Table>
-        </>
+        <div ref={containerRef}>
+            {
+                !isGridView
+                    ? <ListTable dataProps={dataProps} />
+                    : <ListCard dataProps={dataProps} />
+            }
+        </div>
+
     )
 }
 

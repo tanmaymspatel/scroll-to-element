@@ -11,7 +11,8 @@ const useStyle = createStyles(() => ({
     },
     main: {
         flexGrow: 1,
-        overflow: "auto"
+        overflowY: "auto",
+        overflowX: "hidden",
     }
 }))
 /**
@@ -25,7 +26,11 @@ function MainView() {
 
     useEffect(() => {
         if (window.innerWidth < 576) setCurrentView("grid");
-    })
+    }, [window.innerWidth])
+
+    useEffect(() => {
+        localStorage.setItem("currentView", currentView)
+    }, [currentView])
 
     return (
         <Stack h={"100%"} spacing={0}>
@@ -41,4 +46,4 @@ function MainView() {
     )
 }
 
-export default MainView
+export default MainView;
