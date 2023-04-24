@@ -48,10 +48,18 @@ function ScrollList({ currentView, isGridView }: IScrollListProps) {
     // storing the id of the first element in view port
     useLayoutEffect(() => {
         if (scrollTo) {
-            if (currentView === "grid") setIdToBePreserved(scrollTo.childNodes[0].firstChild.nodeValue);
-            if (currentView === "list") setIdToBePreserved(scrollTo.childNodes[0].childNodes[1]?.children[0]?.innerText.slice(3));
+            if (view === "list") { setIdToBePreserved(scrollTo.className.slice(5)); }
+            if (view === "grid") { setIdToBePreserved(scrollTo.className.split(" ")[1].slice(5)); }
+            localStorage.setItem("iddd", JSON.stringify(idToBePreserved))
+            // if (view === "grid") console.log(scrollTo.className.split(" ")[1].slice(5), view);
         }
+        // console.log(idToBePreserved);
+
     }, [currentView]);
+
+    useEffect(() => {
+        console.log(idToBePreserved);
+    }, [idToBePreserved])
 
     /**
      * @name scrollToElement
@@ -61,13 +69,8 @@ function ScrollList({ currentView, isGridView }: IScrollListProps) {
      */
     const scrollToElementAfterTogglingView = () => {
         if (idToBePreserved) {
-            if (view === "grid") {
-                document.getElementById(`card-${idToBePreserved}`)?.scrollIntoView()
-            }
-            if (view === "list") {
-                document.getElementById(`row-${idToBePreserved}`)?.scrollIntoView();
-            }
-            window.scrollBy(0, -192);
+            document.querySelector(`.user-${idToBePreserved}`)?.scrollIntoView();
+            window.scrollBy(0, -190);
         }
     }
     // Restoring the scroll after toggling the view
@@ -93,7 +96,6 @@ function ScrollList({ currentView, isGridView }: IScrollListProps) {
                     : <ListCard dataProps={dataProps} />
             }
         </div>
-
     )
 }
 

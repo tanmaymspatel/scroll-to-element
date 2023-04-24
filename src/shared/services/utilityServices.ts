@@ -24,7 +24,7 @@ const scrollToElementAfterBackClick = () => {
 const findFirstElementInViewPort = (elements: any) =>
     Array.prototype.find.call(
         elements,
-        element => element.getBoundingClientRect().y >= 192 // header offset
+        element => element.getBoundingClientRect().y >= 190 // header offset
     );
 
 const utilityServices = {

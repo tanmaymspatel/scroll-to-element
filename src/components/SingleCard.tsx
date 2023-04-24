@@ -66,8 +66,8 @@ const SingleCard = React.forwardRef(({ user }: IsingleCardProps, ref: any) => {
     )
 
     const content = ref
-        ? <Grid.Col ref={ref} data-item="true" md={6} lg={4} key={user.id}>{body}</Grid.Col>
-        : <Grid.Col data-item="true" md={6} lg={4} key={user.id}>{body}</Grid.Col>
+        ? <Grid.Col ref={ref} className={`user-${user.id}`} data-item="true" md={6} lg={4} key={user.id}>{body}</Grid.Col>
+        : <Grid.Col className={`user-${user.id}`} data-item="true" md={6} lg={4} key={user.id}>{body}</Grid.Col>
 
     return content;
 })

@@ -36,10 +36,9 @@ const TableRow = react.forwardRef(({ user }: ITableRowProps, ref: any) => {
             <td>{user.completed ? "YES" : "NO"}</td>
         </>
 
-
     const content = ref
-        ? <tr ref={ref} data-item="true" id={`row-${user.id}`}>{body}</tr>
-        : <tr data-item="true" id={`row-${user.id}`}>{body}</tr>
+        ? <tr ref={ref} className={`user-${user.id}`} data-item="true" id={`row-${user.id}`}>{body}</tr>
+        : <tr className={`user-${user.id}`} data-item="true" id={`row-${user.id}`}>{body}</tr>
 
     return content;
 });
