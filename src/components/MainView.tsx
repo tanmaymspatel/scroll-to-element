@@ -19,8 +19,10 @@ const useStyle = createStyles(() => ({
  * @returns component with header and listing view 
  */
 function MainView() {
-
-    const [currentView, setCurrentView] = useState("list");
+    const isClicked = localStorage.getItem("isClicked") as string;
+    const viewInLocal = localStorage.getItem("currentView") as string
+    const initialView = (isClicked === "yes" && viewInLocal === "grid") ? "grid" : "list";
+    const [currentView, setCurrentView] = useState(initialView);
     const { classes } = useStyle();
     const isGridView = currentView === "grid";
 

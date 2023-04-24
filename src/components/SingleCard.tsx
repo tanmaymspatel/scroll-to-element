@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import { Grid, Card, Group, Badge, Button, Image, Text, createStyles } from "@mantine/core"
 import { userDetails } from "../shared/model/userDetails";
 
@@ -9,6 +10,9 @@ const useStyle = createStyles(() => ({
         whiteSpace: "nowrap",
         width: "300px"
     },
+    cursor_pointer: {
+        cursor: "pointer"
+    }
 }
 ));
 
@@ -18,7 +22,18 @@ interface IsingleCardProps {
 
 const SingleCard = React.forwardRef(({ user }: IsingleCardProps, ref: any) => {
 
-    const { classes } = useStyle();
+    const { classes, cx } = useStyle();
+    const navigate = useNavigate();
+    /**
+    * @name navigateToUserDetails
+    * @param id id of the clicked user 
+    * @description navigates to respective details of the user page; stores values of id and isclicked to the localstorage 
+    */
+    const navigateToUserDetails = (id: number) => {
+        navigate(`${id}`);
+        localStorage.setItem("clickedId", JSON.stringify(id));
+        localStorage.setItem("isClicked", "yes");
+    }
 
     const body = (
         <Card shadow="sm" padding="lg" radius="md" withBorder id={`card-${user.id}`}>
@@ -35,7 +50,12 @@ const SingleCard = React.forwardRef(({ user }: IsingleCardProps, ref: any) => {
                 </Badge>
             </Group>
 
-            <Text size="sm" color="dimmed" className={classes.text_ellipsis}>
+            <Text
+                size="sm"
+                color="dimmed"
+                className={cx(classes.text_ellipsis, classes.cursor_pointer)}
+                onClick={() => navigateToUserDetails(user.id)}
+            >
                 {user.title}
             </Text>
 

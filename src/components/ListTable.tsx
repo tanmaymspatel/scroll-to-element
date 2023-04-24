@@ -1,10 +1,10 @@
+import { useEffect } from 'react';
 import { Table } from '@mantine/core';
 import { createStyles } from '@mantine/styles'
 import { useInView } from "react-intersection-observer";
 
 import TableRow from './TableRow';
 import { userDetails } from '../shared/model/userDetails';
-import { useEffect } from 'react';
 
 const useStyle = createStyles((theme) => ({
     thead: {
@@ -41,7 +41,6 @@ function ListTable({ dataProps }: any) {
                 <tr>
                     <th>#</th>
                     <th>Title</th>
-                    <th>id</th>
                     <th>User id</th>
                     <th>IsCompleted</th>
                 </tr>
@@ -51,4 +50,4 @@ function ListTable({ dataProps }: any) {
     )
 }
 
-export default ListTable
+export default ListTable;
