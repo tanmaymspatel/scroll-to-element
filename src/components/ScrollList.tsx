@@ -15,9 +15,12 @@ interface IScrollListProps {
  */
 function ScrollList({ currentView, isGridView }: IScrollListProps) {
 
+    const clickedId = (parseInt(localStorage.getItem("clickedId") as string));
+    const isClicked = localStorage.getItem("isClicked") as string
     const { getUsers } = scrollServices;
     const { scrollToElementAfterBackClick, findFirstElementInViewPort } = utilityServices;
     const [idToBePreserved, setIdToBePreserved] = useState<number>(0);
+    const [userData, setUserData] = useState<any>([])
     const view = localStorage.getItem("currentView");
     // fetching the user data for infinite scroll
     const {
@@ -29,6 +32,13 @@ function ScrollList({ currentView, isGridView }: IScrollListProps) {
             return lastPage.length ? allPages.length + 1 : undefined
         }
     })
+
+    useEffect(() => {
+        if (data) {
+            setUserData(data);
+        }
+    }, [data]);
+
     // Ref to the container with elements
     const containerRef = useRef<any>(null);
     /**
@@ -50,16 +60,10 @@ function ScrollList({ currentView, isGridView }: IScrollListProps) {
         if (scrollTo) {
             if (view === "list") { setIdToBePreserved(scrollTo.className.slice(5)); }
             if (view === "grid") { setIdToBePreserved(scrollTo.className.split(" ")[1].slice(5)); }
-            localStorage.setItem("iddd", JSON.stringify(idToBePreserved))
-            // if (view === "grid") console.log(scrollTo.className.split(" ")[1].slice(5), view);
         }
         // console.log(idToBePreserved);
 
     }, [currentView]);
-
-    useEffect(() => {
-        console.log(idToBePreserved);
-    }, [idToBePreserved])
 
     /**
      * @name scrollToElement
@@ -78,14 +82,18 @@ function ScrollList({ currentView, isGridView }: IScrollListProps) {
         scrollToElementAfterTogglingView();
     }, [scrollToElementAfterTogglingView])
     // Restoring the scroll after hitting the back button
-    useLayoutEffect(() => {
-        scrollToElementAfterBackClick()
-    }, [scrollToElementAfterBackClick]);
+    useEffect(() => {
+        setTimeout(() => {
+            if (isClicked === "yes" && clickedId) {
+                scrollToElementAfterBackClick()
+            }
+        }, 0)
+    }, [scrollToElementAfterBackClick, clickedId]);
 
     const dataProps = {
         fetchNextPage,
         hasNextPage,
-        data
+        userData
     }
 
     return (

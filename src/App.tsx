@@ -9,7 +9,6 @@ function App() {
 
   useEffect(() => {
     localStorage.setItem("isClicked", "no")
-    localStorage.setItem("clickedId", "1")
   }, []);
 
   return (

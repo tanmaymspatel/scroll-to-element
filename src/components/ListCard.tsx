@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 
 function ListCard({ dataProps }: any) {
 
-    const { hasNextPage, fetchNextPage, data: userData } = dataProps;
+    const { hasNextPage, fetchNextPage, userData } = dataProps;
     const { ref, inView } = useInView();
 
     const cards = userData?.pages?.map((page: userDetails[]) => {

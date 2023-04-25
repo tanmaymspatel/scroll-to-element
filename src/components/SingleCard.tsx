@@ -30,7 +30,7 @@ const SingleCard = React.forwardRef(({ user }: IsingleCardProps, ref: any) => {
     * @description navigates to respective details of the user page; stores values of id and isclicked to the localstorage 
     */
     const navigateToUserDetails = (id: number) => {
-        navigate(`${id}`);
+        navigate(`dashboard/${id}`);
         localStorage.setItem("clickedId", JSON.stringify(id));
         localStorage.setItem("isClicked", "yes");
     }

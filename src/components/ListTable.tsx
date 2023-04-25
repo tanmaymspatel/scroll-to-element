@@ -17,7 +17,7 @@ const useStyle = createStyles((theme) => ({
 
 function ListTable({ dataProps }: any) {
 
-    const { hasNextPage, fetchNextPage, data: userData } = dataProps;
+    const { hasNextPage, fetchNextPage, userData } = dataProps;
     const { classes } = useStyle();
     const { ref, inView } = useInView();
 
