@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 
 interface IHeaderProps {
     setCurrentView: React.Dispatch<React.SetStateAction<string>>,
-    isGridView: boolean
+    isGridView: boolean,
 }
 
 function Header({ setCurrentView, isGridView }: IHeaderProps) {

@@ -1,90 +1,40 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery } from 'react-query';
-import { useInView } from "react-intersection-observer";
 
-import { MediaQuery, Table, createStyles } from "@mantine/core";
-import SingleUser from "./SingleUser";
 import scrollServices from "../shared/services/scrollServices";
-
-const useStyle = createStyles((theme) => ({
-    head: {
-        position: "sticky",
-        top: 0,
-        backgroundColor: theme.white,
-    },
-    list: {
-        display: "grid",
-        gridTemplateColumns: "repeat(1, 1fr)",
-        gridGap: "5px",
-    },
-    list_grid: {
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gridGap: "5px",
-
-        [theme.fn.smallerThan('xl')]: {
-            gridTemplateColumns: "repeat(2, 1fr)",
-        },
-        [theme.fn.smallerThan('md')]: {
-            gridTemplateColumns: "repeat(1, 1fr)",
-        }
-    },
-    header_visibility: {
-        visibility: "hidden",
-        display: "none"
-    }
-}))
+import ListTable from "./ListTable";
+import ListCard from "./ListCard";
+import utilityServices from '../shared/services/utilityServices'
 
 interface IScrollListProps {
     currentView: string,
-    isGridView: boolean
+    isGridView: boolean,
 }
-
 /**
- * @returns 
+ * @returns user list in form of cards and table
  */
 function ScrollList({ currentView, isGridView }: IScrollListProps) {
 
-    const { classes, cx } = useStyle();
     const { getUsers } = scrollServices;
-    const { ref, inView } = useInView();
-
+    const { scrollToElementAfterBackClick, findFirstElementInViewPort } = utilityServices;
+    const [idToBePreserved, setIdToBePreserved] = useState<number>(0);
+    const view = localStorage.getItem("currentView");
+    // fetching the user data for infinite scroll
     const {
-        fetchNextPage, //function 
-        hasNextPage, // boolean
-        isFetchingNextPage, // boolean
+        fetchNextPage,
+        hasNextPage,
         data,
     } = useInfiniteQuery('/users', ({ pageParam = 1 }) => getUsers(pageParam), {
         getNextPageParam: (lastPage, allPages) => {
             return lastPage.length ? allPages.length + 1 : undefined
         }
     })
-
-    // const intObserver = useRef<any>()
-    // const lastPostRef = useCallback((user: any) => {
-    //     if (isFetchingNextPage) return
-
-    //     if (intObserver.current) intObserver.current.disconnect()
-
-    //     intObserver.current = new IntersectionObserver(users => {
-    //         if (users[0].isIntersecting && hasNextPage) {
-    //             fetchNextPage()
-    //         }
-    //     })
-
-    //     if (user) intObserver.current.observe(user)
-    // }, [isFetchingNextPage, fetchNextPage, hasNextPage])
-
-    // Helper function that allows finding first element in the view port
-    const findFirstElementInViewPort = (elements: any) =>
-        Array.prototype.find.call(
-            elements,
-            element => element.getBoundingClientRect().y >= 150 // header offset
-        );
-
     // Ref to the container with elements
     const containerRef = useRef<any>(null);
-
+    /**
+     * @name scrollTo
+     * @description first element in the viewport with the reference to the container
+     */
     const scrollTo = useMemo(() => {
         // Find all elements in container which will be checked if are in view or not
         const nodeElements = containerRef.current?.querySelectorAll("[data-item]");
@@ -95,66 +45,57 @@ function ScrollList({ currentView, isGridView }: IScrollListProps) {
 
         return undefined;
     }, [currentView]);
-
+    // storing the id of the first element in view port
     useLayoutEffect(() => {
         if (scrollTo) {
-            // Scroll to element with should be in view after rendering
-            scrollTo.scrollIntoView();
-            // Scroll by height of header
-            window.scrollBy(0, -150);
+            if (view === "list") { setIdToBePreserved(scrollTo.className.slice(5)); }
+            if (view === "grid") { setIdToBePreserved(scrollTo.className.split(" ")[1].slice(5)); }
+            localStorage.setItem("iddd", JSON.stringify(idToBePreserved))
+            // if (view === "grid") console.log(scrollTo.className.split(" ")[1].slice(5), view);
         }
-    }, [scrollTo, currentView]);
+        // console.log(idToBePreserved);
 
-    const content = data?.pages?.map((pg) => {
-        return pg.map((user: any, index: number) => {
-            if (pg.length === index + 1) {
-                return <SingleUser ref={ref} key={user.id} user={user} isGridView={isGridView} />
-            }
-            return <SingleUser key={user.id} user={user} isGridView={isGridView} />
-        })
-    })
-    /**
-     * @name getElAfterBack
-     * @description method to restore the scroll after hiiting the back button
-     */
-    const getElAfterBack = () => {
-        let id = (parseInt(localStorage.getItem("id") as string));
-        id--;
-        const isClicked = localStorage.getItem("isClicked") as string
-        if (isClicked === "yes") document.getElementById(`list-td-${id}`)?.scrollIntoView();
-    }
-    // calls before browser reprints the screen
-    useLayoutEffect(() => {
-        getElAfterBack()
-    }, [getElAfterBack])
+    }, [currentView]);
 
     useEffect(() => {
-        if (inView && hasNextPage) {
-            fetchNextPage();
+        console.log(idToBePreserved);
+    }, [idToBePreserved])
+
+    /**
+     * @name scrollToElement
+     * @param idToBePreserved id 
+     * @param view current view
+     * @description scroll to the perticular element in the viewport
+     */
+    const scrollToElementAfterTogglingView = () => {
+        if (idToBePreserved) {
+            document.querySelector(`.user-${idToBePreserved}`)?.scrollIntoView();
+            window.scrollBy(0, -190);
         }
-    }, [inView, fetchNextPage, hasNextPage]);
+    }
+    // Restoring the scroll after toggling the view
+    useEffect(() => {
+        scrollToElementAfterTogglingView();
+    }, [scrollToElementAfterTogglingView])
+    // Restoring the scroll after hitting the back button
+    useLayoutEffect(() => {
+        scrollToElementAfterBackClick()
+    }, [scrollToElementAfterBackClick]);
+
+    const dataProps = {
+        fetchNextPage,
+        hasNextPage,
+        data
+    }
 
     return (
-        <>
-            <Table striped highlightOnHover horizontalSpacing="md" verticalSpacing="md" fontSize="md">
-                <MediaQuery smallerThan={"sm"} styles={{ display: "none" }}>
-                    <thead
-                        className={cx(classes.head,
-                            { [classes.header_visibility]: isGridView }
-                        )}>
-                        <tr>
-                            <th>id</th>
-                            <th>Title</th>
-                            <th>User id</th>
-                            <th>IsCompleted</th>
-                        </tr>
-                    </thead>
-                </MediaQuery>
-                <tbody ref={containerRef} className={isGridView ? classes.list_grid : ""} >
-                    {content}
-                </tbody>
-            </Table>
-        </>
+        <div ref={containerRef}>
+            {
+                !isGridView
+                    ? <ListTable dataProps={dataProps} />
+                    : <ListCard dataProps={dataProps} />
+            }
+        </div>
     )
 }
 

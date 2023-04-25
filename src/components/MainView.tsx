@@ -11,21 +11,28 @@ const useStyle = createStyles(() => ({
     },
     main: {
         flexGrow: 1,
-        overflow: "auto"
+        overflowY: "auto",
+        overflowX: "hidden",
     }
 }))
 /**
  * @returns component with header and listing view 
  */
 function MainView() {
-
-    const [currentView, setCurrentView] = useState("list");
+    const isClicked = localStorage.getItem("isClicked") as string;
+    const viewInLocal = localStorage.getItem("currentView") as string
+    const initialView = (isClicked === "yes" && viewInLocal === "grid") ? "grid" : "list";
+    const [currentView, setCurrentView] = useState(initialView);
     const { classes } = useStyle();
     const isGridView = currentView === "grid";
 
     useEffect(() => {
         if (window.innerWidth < 576) setCurrentView("grid");
-    })
+    }, [window.innerWidth])
+
+    useEffect(() => {
+        localStorage.setItem("currentView", currentView)
+    }, [currentView])
 
     return (
         <Stack h={"100%"} spacing={0}>
@@ -41,4 +48,4 @@ function MainView() {
     )
 }
 
-export default MainView
+export default MainView;

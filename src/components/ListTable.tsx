@@ -1,5 +1,10 @@
+import { useEffect } from 'react';
 import { Table } from '@mantine/core';
 import { createStyles } from '@mantine/styles'
+import { useInView } from "react-intersection-observer";
+
+import TableRow from './TableRow';
+import { userDetails } from '../shared/model/userDetails';
 
 const useStyle = createStyles((theme) => ({
     thead: {
@@ -9,26 +14,33 @@ const useStyle = createStyles((theme) => ({
         top: 0
     }
 }))
-function ListTable({ userData }: any) {
 
+function ListTable({ dataProps }: any) {
+
+    const { hasNextPage, fetchNextPage, data: userData } = dataProps;
     const { classes } = useStyle();
+    const { ref, inView } = useInView();
 
-    const rows = userData?.map((user: any, index: number) => (
-        <tr key={user.id}>
-            <td>{index + 1}</td>
-            <td>{user.title}</td>
-            <td>{user.id}</td>
-            <td>{user.userId}</td>
-            <td>{user.completed ? "YES" : "NO"}</td>
-        </tr>
-    ));
+    const rows = userData?.pages?.map((page: userDetails[]) => {
+        return page.map((user: userDetails, index: number) => {
+            if (page.length === index + 1) {
+                return <TableRow ref={ref} user={user} key={user.id} />
+            }
+            return <TableRow user={user} key={user.id} />
+        })
+    })
+
+    useEffect(() => {
+        if (inView && hasNextPage) {
+            fetchNextPage();
+        }
+    }, [inView, fetchNextPage, hasNextPage]);
     return (
         <Table striped highlightOnHover horizontalSpacing="md" verticalSpacing="md" fontSize="md">
             <thead className={classes.thead}>
                 <tr>
                     <th>#</th>
                     <th>Title</th>
-                    <th>id</th>
                     <th>User id</th>
                     <th>IsCompleted</th>
                 </tr>
@@ -38,4 +50,4 @@ function ListTable({ userData }: any) {
     )
 }
 
-export default ListTable
+export default ListTable;
