@@ -5,9 +5,15 @@ interface IHeaderProps {
     setCurrentView: React.Dispatch<React.SetStateAction<string>>,
     isGridView: boolean,
 }
-
+/**
+ * @returns header of the listing page
+ */
 function Header({ setCurrentView, isGridView }: IHeaderProps) {
 
+    /**
+     * @name changeListView
+     * @description to change the view
+     */
     const changeListView = useCallback(() => {
         setCurrentView((prev: string) => prev === 'list' ? "grid" : "list");
     }, [setCurrentView])

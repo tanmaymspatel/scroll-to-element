@@ -39,7 +39,7 @@ function ScrollList({ currentView, isGridView }: IScrollListProps) {
         }
     }, [data]);
 
-    // Ref to the container with elements
+    // Ref to the container with the user list
     const containerRef = useRef<any>(null);
     /**
      * @name scrollTo

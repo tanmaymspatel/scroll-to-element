@@ -1,10 +1,13 @@
 import { useEffect } from "react";
 import { BrowserRouter } from 'react-router-dom';
-import { MantineProvider } from "@mantine/core"
-import AppShellLayout from "./core/components/AppShell"
+import { MantineProvider } from "@mantine/core";
 
-import '../src/assets/icons/style.css'
-
+import AppShellLayout from "./core/components/AppShell";
+import '../src/assets/icons/style.css';
+import GlobalStyles from "./core/components/GlobalStyles";
+/**
+ * @returns POC in Mantine UI
+ */
 function App() {
 
   useEffect(() => {
@@ -22,6 +25,7 @@ function App() {
           xl: '75em',
         }
       }}>
+        <GlobalStyles />
         <BrowserRouter>
           <AppShellLayout />
         </BrowserRouter>

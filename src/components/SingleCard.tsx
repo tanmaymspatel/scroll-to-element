@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useNavigate } from 'react-router-dom';
 import { Grid, Card, Group, Badge, Button, Image, Text, createStyles } from "@mantine/core"
 import { userDetails } from "../shared/model/userDetails";
@@ -19,7 +19,9 @@ const useStyle = createStyles(() => ({
 interface IsingleCardProps {
     user: userDetails
 }
-
+/**
+ * @returns individual card component 
+ */
 const SingleCard = React.forwardRef(({ user }: IsingleCardProps, ref: any) => {
 
     const { classes, cx } = useStyle();
@@ -64,7 +66,7 @@ const SingleCard = React.forwardRef(({ user }: IsingleCardProps, ref: any) => {
             </Button>
         </Card>
     )
-
+    // ref is added to the last element
     const content = ref
         ? <Grid.Col ref={ref} className={`user-${user.id}`} data-item="true" md={6} lg={4} key={user.id}>{body}</Grid.Col>
         : <Grid.Col className={`user-${user.id}`} data-item="true" md={6} lg={4} key={user.id}>{body}</Grid.Col>

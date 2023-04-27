@@ -13,7 +13,9 @@ const useStyle = createStyles(() => ({
         cursor: "pointer"
     }
 }))
-
+/**
+ * @returns individual table row
+ */
 const TableRow = react.forwardRef(({ user }: ITableRowProps, ref: any) => {
 
     const { classes } = useStyle();
@@ -36,6 +38,7 @@ const TableRow = react.forwardRef(({ user }: ITableRowProps, ref: any) => {
             <td>{user.completed ? "YES" : "NO"}</td>
         </>
 
+    // ref is added to the last element
     const content = ref
         ? <tr ref={ref} className={`user-${user.id}`} data-item="true" id={`row-${user.id}`}>{body}</tr>
         : <tr className={`user-${user.id}`} data-item="true" id={`row-${user.id}`}>{body}</tr>
